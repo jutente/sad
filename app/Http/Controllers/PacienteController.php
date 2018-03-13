@@ -4,6 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Paciente;
+
+use Response;
+use Auth;
+
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Validation\Rule;
+
 class PacienteController extends Controller
 {
     /**
@@ -13,7 +23,15 @@ class PacienteController extends Controller
      */
     public function index()
     {
-        //
+        $pacientes = new Paciente;
+
+        if (request()->has('nome')){
+            $pacientes = $pacientes->where('nome', 'like', '%' . request('nome') . '%');
+        }
+
+        $pacientes = $pacientes->orderby('nome')->paginate(15);
+        
+        return view('paciente.index',compact('pacientes'));
     }
 
     /**
@@ -23,7 +41,7 @@ class PacienteController extends Controller
      */
     public function create()
     {
-        //
+        return view('paciente.create');
     }
 
     /**
@@ -34,7 +52,11 @@ class PacienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Paciente::create($request->all());
+
+        Session::flash('create_paciente', 'paciente cadastrado com sucesso!');
+
+        return redirect(route('paciente.index'));
     }
 
     /**
@@ -45,7 +67,9 @@ class PacienteController extends Controller
      */
     public function show($id)
     {
-        //
+        $paciente = Paciente::findOrFail($id);
+        
+           return view('paciente.show', compact('paciente'));
     }
 
     /**
@@ -56,7 +80,9 @@ class PacienteController extends Controller
      */
     public function edit($id)
     {
-        //
+        $paciente = Paciente::findOrFail($id);       
+        
+        return view('paciente.edit', compact('paciente'));
     }
 
     /**
@@ -68,7 +94,13 @@ class PacienteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $paciente = Paciente::findOrFail($id);
+            
+        $paciente->update($request->all());
+        
+        Session::flash('edited_paciente', 'paciente alterado com sucesso!');
+
+        return redirect(route('paciente.edit', $id));
     }
 
     /**
@@ -79,6 +111,10 @@ class PacienteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Paciente::findOrFail($id)->delete();
+        
+        Session::flash('deleted_paciente', 'paciente excluído com sucesso!');
+        
+        return redirect(route('paciente.index'));
     }
 }

@@ -37,6 +37,20 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
                         &nbsp;
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Menu <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{ route('distrito.index') }}">Distrito</a></li>
+                                <li><a href="{{ route('unidade.index') }}">Unidade</a></li>
+                                <li><a href="{{ route('produto.index') }}">Produto</a></li>
+                                <li><a href="{{ route('profissional.index') }}">Profissional</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="{{ route('paciente.index') }}">Paciente</a></li>
+                        <li><a href="{{ route('pedido.index') }}">Pedido</a></li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

@@ -4,6 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Produto;
+
+use Response;
+use Auth;
+
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Validation\Rule;
+
 class ProdutoController extends Controller
 {
     /**
@@ -13,7 +23,15 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        //
+        $produtos = new produto;
+
+        if (request()->has('nome')){
+            $produtos = $produtos->where('nome', 'like', '%' . request('nome') . '%');
+        }
+
+        $produtos = $produtos->orderby('nome')->paginate(15);
+        
+        return view('produto.index',compact('produtos'));
     }
 
     /**
@@ -23,7 +41,7 @@ class ProdutoController extends Controller
      */
     public function create()
     {
-        //
+        return view('produto.create');
     }
 
     /**
@@ -34,7 +52,11 @@ class ProdutoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        produto::create($request->all());
+
+        Session::flash('create_produto', 'produto cadastrado com sucesso!');
+
+        return redirect(route('produto.index'));
     }
 
     /**
@@ -45,7 +67,9 @@ class ProdutoController extends Controller
      */
     public function show($id)
     {
-        //
+        $produto = produto::findOrFail($id);
+        
+           return view('produto.show', compact('produto'));
     }
 
     /**
@@ -56,7 +80,9 @@ class ProdutoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $produto = produto::findOrFail($id);       
+        
+        return view('produto.edit', compact('produto'));
     }
 
     /**
@@ -68,7 +94,13 @@ class ProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $produto = produto::findOrFail($id);
+            
+        $produto->update($request->all());
+        
+        Session::flash('edited_produto', 'produto alterado com sucesso!');
+
+        return redirect(route('produto.edit', $id));
     }
 
     /**
@@ -79,6 +111,10 @@ class ProdutoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        produto::findOrFail($id)->delete();
+        
+        Session::flash('deleted_produto', 'produto excluído com sucesso!');
+        
+        return redirect(route('produto.index'));
     }
 }

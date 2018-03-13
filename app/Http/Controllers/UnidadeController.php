@@ -4,6 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Distrito;
+use App\Unidade;
+
+use Response;
+use Auth;
+
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Validation\Rule;
+
 class UnidadeController extends Controller
 {
     /**
@@ -13,7 +24,16 @@ class UnidadeController extends Controller
      */
     public function index()
     {
-        //
+        $unidades = new Unidade;
+
+        // filtros
+        if (request()->has('nome')){
+            $unidades = $unidades->where('nome', 'like', '%' . request('nome') . '%');
+        }
+
+        $unidades = $unidades->orderby('nome')->paginate(15);
+
+        return view('unidade.index',compact('unidades')); 
     }
 
     /**
@@ -23,7 +43,9 @@ class UnidadeController extends Controller
      */
     public function create()
     {
-        //
+        $setors = Setor::orderBy('nome')->pluck('nome', 'id');
+
+        return view('unidade.create', compact('unidades','setors'));
     }
 
     /**
@@ -34,7 +56,11 @@ class UnidadeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Unidade::create($request->all());
+
+        Session::flash('create_unidade', 'Unidade cadastrado com sucesso!');
+
+        return redirect(route('unidade.index'));
     }
 
     /**
@@ -45,7 +71,9 @@ class UnidadeController extends Controller
      */
     public function show($id)
     {
-        //
+        $unidade = Unidade::findOrFail($id);
+        
+           return view('unidade.show', compact('unidade'));
     }
 
     /**
@@ -56,7 +84,9 @@ class UnidadeController extends Controller
      */
     public function edit($id)
     {
-        //
+        $unidade = Unidade::findOrFail($id);       
+        
+        return view('unidade.edit', compact('unidade'));
     }
 
     /**
@@ -68,7 +98,13 @@ class UnidadeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $unidade = Unidade::findOrFail($id);
+            
+        $unidade->update($request->all());
+        
+        Session::flash('edited_unidade', 'unidade alterado com sucesso!');
+
+        return redirect(route('unidade.edit', $id));
     }
 
     /**
@@ -79,6 +115,10 @@ class UnidadeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Unidade::findOrFail($id)->delete();
+        
+        Session::flash('deleted_unidade', 'Unidade excluído com sucesso!');
+        
+        return redirect(route('unidade.index'));
     }
 }
